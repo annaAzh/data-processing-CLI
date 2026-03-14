@@ -1,6 +1,8 @@
 import { upCommand, cdCommand, lsCommand } from './navigation.js'
 import { useStore } from './state/currentDirectory.js'
 import { printCurrentDirectory } from './utils/pathResolver.js'
+import { access } from 'node:fs/promises'
+import { csvToJson } from './commands/index.js'
 
 export const repl = async (command, args) => {
   const { getCurrentWorkingDir, setCurrentWorkingDirectory } = useStore()
@@ -25,11 +27,23 @@ export const repl = async (command, args) => {
         printCurrentDirectory(currentPath)
         break
       }
+      case 'csv-to-json': {
+        const index = args.indexOf('--input')
+        if (index === -1) throw new Error('Operation failed')
+        const inputPath = args[index + 1]
+        await access(inputPath)
+
+        const indexOutput = args.indexOf('--output')
+        const outputPath = args[indexOutput + 1]
+
+        csvToJson(inputPath, outputPath)
+        printCurrentDirectory(currentPath)
+        break
+      }
       default:
         console.log('Invalid input')
     }
-  } catch (error) {
-    console.log(error.message, '!!!!!!!')
+  } catch {
     console.log('Operation failed')
   }
 }
