@@ -2,7 +2,7 @@ import { upCommand, cdCommand, lsCommand } from './navigation.js'
 import { useStore } from './state/currentDirectory.js'
 import { printCurrentDirectory } from './utils/pathResolver.js'
 import { access } from 'node:fs/promises'
-import { csvToJson, countCommand, jsonToCsv, hashCommand } from './commands/index.js'
+import { csvToJson, countCommand, jsonToCsv, hashCommand, hashCompare } from './commands/index.js'
 import { paintText } from './utils/paintText.js'
 import { parsePath } from './utils/argParser.js'
 
@@ -78,6 +78,24 @@ export const repl = async (command, args) => {
         const indexSave = args.indexOf('--save')
         const save = indexSave !== -1
         await hashCommand(inputPath, algorithm, save)
+        printCurrentDirectory(currentPath)
+        break
+      }
+      case 'hash-compare': {
+        const index = args.indexOf('--input')
+        if (index === -1) throw new Error('Operation failed')
+        const inputPath = parsePath(args[index + 1])
+        await access(inputPath)
+
+        const indexHash = args.indexOf('--hash')
+        if (index === -1) throw new Error('Operation failed')
+        const comparePath = parsePath(args[indexHash + 1])
+        await access(comparePath)
+
+        const indexAlg = args.indexOf('--algorithm')
+        const algorithm = indexAlg === -1 ? 'sha256' : args[indexAlg + 1]
+
+        await hashCompare(inputPath, comparePath, algorithm)
         printCurrentDirectory(currentPath)
         break
       }
