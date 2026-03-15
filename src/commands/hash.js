@@ -2,12 +2,14 @@ import { createHash } from 'node:crypto'
 import { createReadStream, createWriteStream } from 'node:fs'
 import { basename, dirname, resolve } from 'node:path'
 import { pipeline } from 'node:stream/promises'
+import { paintText } from '../utils/paintText.js'
+import { Transform } from 'node:stream'
 
 const ALLOWED_ALGORITHM = ['sha256', 'md5', 'sha512']
 
 export const hashCommand = async (inputPath, algorithm = 'sha256', savePath) => {
   if (algorithm && !ALLOWED_ALGORITHM.includes(algorithm)) {
-    console.log('Operation failed')
+    console.log(paintText('Operation failed', 'red'))
     return
   }
 
@@ -27,7 +29,7 @@ export const hashCommand = async (inputPath, algorithm = 'sha256', savePath) => 
       ws.write(result)
       ws.end()
     }
-  } catch (error) {
-    console.log('Operation failed')
+  } catch {
+    console.log(paintText('Operation failed', 'red'))
   }
 }

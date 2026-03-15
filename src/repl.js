@@ -3,6 +3,8 @@ import { useStore } from './state/currentDirectory.js'
 import { printCurrentDirectory } from './utils/pathResolver.js'
 import { access } from 'node:fs/promises'
 import { csvToJson, countCommand, jsonToCsv, hashCommand } from './commands/index.js'
+import { paintText } from './utils/paintText.js'
+import { parsePath } from './utils/argParser.js'
 
 export const repl = async (command, args) => {
   const { getCurrentWorkingDir, setCurrentWorkingDirectory } = useStore()
@@ -78,9 +80,9 @@ export const repl = async (command, args) => {
         await hashCommand(inputPath, algorithm, save)
       }
       default:
-        console.log('Invalid input')
+        console.log(paintText('Invalid input', 'yellow'))
     }
   } catch {
-    console.log('Operation failed')
+    console.log(paintText('Operation failed', 'red'))
   }
 }

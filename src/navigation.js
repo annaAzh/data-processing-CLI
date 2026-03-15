@@ -2,12 +2,13 @@ import { resolve } from 'path'
 import { getHomeDir } from './utils/pathResolver.js'
 import { readdir } from 'fs/promises'
 import { access } from 'node:fs/promises'
+import { paintText } from './utils/paintText.js'
 
 export const upCommand = currentPath => {
   const pathToUp = resolve(currentPath, '..')
 
   if (currentPath === getHomeDir()) {
-    console.log(`You are already in ${getHomeDir()}`)
+    console.log(paintText(`You are already in ${getHomeDir()}`, 'yellow'))
     return currentPath
   }
   return pathToUp

@@ -3,6 +3,7 @@ import { stdin as input, stdout as output } from 'node:process'
 import { argsParser } from './utils/argParser.js'
 import { useStore } from './state/currentDirectory.js'
 import { printCurrentDirectory } from './utils/pathResolver.js'
+import { paintText } from './utils/paintText.js'
 import { repl } from './repl.js'
 
 const app = () => {
@@ -12,7 +13,7 @@ const app = () => {
 
   const rl = readline.createInterface({ input, output, prompt: '> ' })
 
-  console.log('Welcome to Data Processing CLI!')
+  console.log(paintText('Welcome to Data Processing CLI!', 'magenta'))
   printCurrentDirectory(currentDir)
 
   rl.prompt()
@@ -33,7 +34,7 @@ const app = () => {
   })
 
   rl.on('close', () => {
-    console.log('Thank you for using Data Processing CLI!')
+    console.log(paintText('Thank you for using Data Processing CLI!', 'magenta'))
   })
 
   process.on('.exit', () => rl.close())
