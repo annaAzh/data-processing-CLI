@@ -22,8 +22,8 @@ export const csvToJson = async (inputPath, outputPath) => {
           title = line.split(',')
           output += '[\n'
         } else {
-          output += createJson(title, line)
           if (!isComma) output += ',\n'
+          output += createJson(title, line)
           isComma = false
         }
       }
@@ -46,10 +46,7 @@ export const csvToJson = async (inputPath, outputPath) => {
 
 const createJson = (title, line) => {
   const values = line.split(',')
-  const obj = {}
+  const pairs = title.map((key, i) => `"${key}": "${values[i]}"`)
 
-  for (let i = 0; i < title.length; i += 1) {
-    obj[title[i]] = values[i]
-  }
-  return '  ' + JSON.stringify(obj, null, 2).replace(/\n/g, '\n  ')
+  return '  { ' + pairs.join(', ') + ' }'
 }

@@ -19,7 +19,8 @@ export const repl = async (command, args) => {
         break
       }
       case 'cd': {
-        const targetPath = await cdCommand(currentPath, args)
+        const parsedArgs = args.map(arg => parsePath(arg))
+        const targetPath = await cdCommand(currentPath, parsedArgs)
         printCurrentDirectory(targetPath)
         setCurrentWorkingDirectory(targetPath)
         break
@@ -32,52 +33,53 @@ export const repl = async (command, args) => {
       case 'csv-to-json': {
         const index = args.indexOf('--input')
         if (index === -1) throw new Error('Operation failed')
-        const inputPath = args[index + 1]
+        const inputPath = parsePath(args[index + 1])
         await access(inputPath)
 
         const indexOutput = args.indexOf('--output')
-        const outputPath = args[indexOutput + 1]
+        const outputPath = parsePath(args[indexOutput + 1])
 
-        csvToJson(inputPath, outputPath)
+        await csvToJson(inputPath, outputPath)
         printCurrentDirectory(currentPath)
         break
       }
       case 'json-to-csv': {
         const index = args.indexOf('--input')
         if (index === -1) throw new Error('Operation failed')
-        const inputPath = args[index + 1]
+        const inputPath = parsePath(args[index + 1])
         await access(inputPath)
 
         const indexOutput = args.indexOf('--output')
-        const outputPath = args[indexOutput + 1]
+        const outputPath = parsePath(args[indexOutput + 1])
 
-        jsonToCsv(inputPath, outputPath)
+        await jsonToCsv(inputPath, outputPath)
         printCurrentDirectory(currentPath)
         break
       }
       case 'count': {
         const index = args.indexOf('--input')
         if (index === -1) throw new Error('Operation failed')
-        const inputPath = args[index + 1]
+        const inputPath = parsePath(args[index + 1])
         await access(inputPath)
 
-        countCommand(inputPath)
+        await countCommand(inputPath)
         printCurrentDirectory(currentPath)
         break
       }
       case 'hash': {
         const index = args.indexOf('--input')
         if (index === -1) throw new Error('Operation failed')
-        const inputPath = args[index + 1]
+        const inputPath = parsePath(args[index + 1])
         await access(inputPath)
 
         const indexAlg = args.indexOf('--algorithm')
         const algorithm = indexAlg === -1 ? 'sha256' : args[indexAlg + 1]
 
         const indexSave = args.indexOf('--save')
-        const save = indexSave === -1 ? undefined : args[indexSave + 1]
-
+        const save = indexSave !== -1
         await hashCommand(inputPath, algorithm, save)
+        printCurrentDirectory(currentPath)
+        break
       }
       default:
         console.log(paintText('Invalid input', 'yellow'))

@@ -7,7 +7,7 @@ import { Transform } from 'node:stream'
 
 const ALLOWED_ALGORITHM = ['sha256', 'md5', 'sha512']
 
-export const hashCommand = async (inputPath, algorithm = 'sha256', savePath) => {
+export const hashCommand = async (inputPath, algorithm, savePath) => {
   if (algorithm && !ALLOWED_ALGORITHM.includes(algorithm)) {
     console.log(paintText('Operation failed', 'red'))
     return
@@ -17,7 +17,14 @@ export const hashCommand = async (inputPath, algorithm = 'sha256', savePath) => 
     const hash = createHash(algorithm)
     const rs = createReadStream(inputPath)
 
-    await pipeline(rs, hash)
+    const transform = new Transform({
+      transform(chunk, _encoding, callback) {
+        hash.update(chunk)
+        callback()
+      }
+    })
+
+    await pipeline(rs, transform)
 
     const result = hash.digest('hex')
     process.stdout.write(`${algorithm}: ${result}\n`)

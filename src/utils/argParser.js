@@ -3,12 +3,9 @@ import { useStore } from '../state/currentDirectory.js'
 import { resolve, dirname } from 'path'
 
 export const argsParser = line => {
-  const [command, ...rest] =
-    line.trim().match(/'([^']*)'|"([^"]*)"|([^\s]+)/g) ||
-    [].map(arg => arg.replace(/^['"]|['"]$/g, ''))
-
-  const args = rest.length > 0 ? [parsePath(rest[0]), ...rest.slice(1)] : []
-  return { command, args }
+  const tokens = line.trim().match(/'([^']*)'|"([^"]*)"|([^\s]+)/g) || []
+  const [command, ...rest] = tokens.map(arg => arg.replace(/^['"]|['"]$/g, ''))
+  return { command, args: rest }
 }
 
 export const parsePath = line => {
