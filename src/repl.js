@@ -2,7 +2,7 @@ import { upCommand, cdCommand, lsCommand } from './navigation.js'
 import { useStore } from './state/currentDirectory.js'
 import { printCurrentDirectory } from './utils/pathResolver.js'
 import { access } from 'node:fs/promises'
-import { csvToJson, countCommand, jsonToCsv } from './commands/index.js'
+import { csvToJson, countCommand, jsonToCsv, hashCommand } from './commands/index.js'
 
 export const repl = async (command, args) => {
   const { getCurrentWorkingDir, setCurrentWorkingDirectory } = useStore()
@@ -62,6 +62,20 @@ export const repl = async (command, args) => {
         countCommand(inputPath)
         printCurrentDirectory(currentPath)
         break
+      }
+      case 'hash': {
+        const index = args.indexOf('--input')
+        if (index === -1) throw new Error('Operation failed')
+        const inputPath = args[index + 1]
+        await access(inputPath)
+
+        const indexAlg = args.indexOf('--algorithm')
+        const algorithm = indexAlg === -1 ? 'sha256' : args[indexAlg + 1]
+
+        const indexSave = args.indexOf('--save')
+        const save = indexSave === -1 ? undefined : args[indexSave + 1]
+
+        await hashCommand(inputPath, algorithm, save)
       }
       default:
         console.log('Invalid input')
